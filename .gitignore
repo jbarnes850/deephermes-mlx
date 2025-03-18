@@ -53,6 +53,10 @@ benchmarks/datasets/cached/mmlu_data.tar
 
 # windsurf rules
 .windsurfrules
+plan.md
 
 # Test data
 /adapters
+/test_adapter
+/exported_demo_model
+data/alpaca_data.json
