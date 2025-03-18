@@ -4,6 +4,8 @@
   <img src="assets/images/deephermes.jpeg" alt="DeepHermes Logo" width="600"/>
 </div>
 
+> **Vision**: Can we build a world where AI adapts to your hardware, keeps data private, turns ordinary devices into networked compute clusters, and integrates seamlessly with existing workflows? DeepHermes MLX is a small step toward this vision by providing high-performance local inference for DeepHermes reasoning models.
+
 This repository contains a Python implementation for running inference with DeepHermes models on Apple Silicon using the MLX framework. It supports memory-efficient loading options, enhanced reasoning capabilities, comprehensive benchmarking, and adaptive model selection.
 
 ## Overview
