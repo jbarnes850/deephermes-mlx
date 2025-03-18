@@ -46,3 +46,7 @@ Thumbs.db
 # MLX specific
 *.mlx.safetensors
 *.mlx.bin
+
+# Datasets
+benchmarks/datasets/cached/data/auxiliary_train/race.csv
+benchmarks/datasets/cached/mmlu_data.tar
