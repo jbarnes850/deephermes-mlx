@@ -25,15 +25,13 @@ echo ""
 echo "Downloading the DeepHermes-3-Llama-3-8B model (this may take a few minutes)..."
 python -c "from transformers import AutoTokenizer; from mlx_lm import load; model, tokenizer = load('mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16'); print('Model downloaded successfully!')"
 
-# Print success message and instructions
+# Print success message
 echo ""
 echo "🎉 Setup complete! DeepHermes-3-Llama-3-8B is ready to use."
 echo ""
-echo "Quick commands:"
-echo "---------------"
-echo "Interactive chat:              python chat.py --reasoning"
-echo "Memory-optimized chat:         python chat.py --reasoning --quantize 4bit"
-echo "Single prompt:                 python main.py --reasoning --prompt \"Your prompt here\""
+echo "Starting interactive chat with reasoning mode..."
+echo "Type 'exit' to quit or 'help' to see available commands."
 echo ""
-echo "For more examples, see examples.md"
-echo ""
+
+# Launch the chat interface with reasoning mode
+python chat.py --reasoning
