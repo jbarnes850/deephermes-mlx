@@ -34,6 +34,7 @@ flowchart TD
 - Memory-efficient options (quantization, lazy loading)
 - Enhanced reasoning capabilities with DeepHermes's specialized thinking process
 - Streaming text generation
+- **LoRA Fine-tuning** for customizing models on your own data
 - **Multi-Model Benchmark Suite** for evaluating model performance
 - **Adaptive Model Selector** for optimal configuration based on hardware
 
@@ -56,6 +57,32 @@ This will:
 - Provide instructions for running the model
 
 After running the quickstart script, you'll be ready to use the model immediately without any additional setup.
+
+## Fine-tuning
+
+DeepHermes MLX supports efficient fine-tuning of models on Apple Silicon using Low-Rank Adaptation (LoRA). This allows you to customize models on your own data while maintaining performance.
+
+### Fine-tuning Workflow
+
+```bash
+# Prepare data and run fine-tuning (using Hugging Face dataset)
+./scripts/finetune_mlx.sh --model "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16" \
+  --dataset-name "tatsu-lab/alpaca" \
+  --num-examples 100 \
+  --prepare-data --train
+
+# Generate text with the fine-tuned model
+./scripts/finetune_mlx.sh --model "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16" \
+  --prompt "Explain the concept of reinforcement learning" \
+  --generate
+```
+
+### Key Features
+
+- **Efficient LoRA Fine-tuning**: Updates only a small fraction of model parameters
+- **HuggingFace Dataset Integration**: Easily use datasets from the HuggingFace Hub
+- **Modular Workflow**: Prepare data, train, evaluate, and generate text in separate steps
+- **Apple Silicon Optimization**: Designed for high performance on M-series chips
 
 ## Installation
 

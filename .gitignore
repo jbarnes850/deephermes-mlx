@@ -50,3 +50,9 @@ Thumbs.db
 # Datasets
 benchmarks/datasets/cached/data/auxiliary_train/race.csv
 benchmarks/datasets/cached/mmlu_data.tar
+
+# windsurf rules
+.windsurfrules
+
+# Test data
+/adapters
