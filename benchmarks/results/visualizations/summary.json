@@ -1,0 +1,12 @@
+[
+  {
+    "Model": "DeepHermes-3-Llama-3-8B-Preview-bf16",
+    "Dataset": "mmlu",
+    "Accuracy (%)": "80.0%",
+    "Avg. Inference Time (s)": "24.63",
+    "Memory Usage (MB)": "12.2",
+    "Reasoning Rate (%)": "80.0%",
+    "Avg. Reasoning Length": "368",
+    "Total Time (s)": "123.2"
+  }
+]
