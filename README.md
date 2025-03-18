@@ -1,18 +1,16 @@
-# DeepHermes-3-Mistral-24B MLX Inference
+# DeepHermes MLX Inference
 
-This repository contains code to run inference on the DeepHermes-3-Mistral-24B model locally using Apple's MLX framework on Apple Silicon devices.
+This repository contains a Python implementation for running inference with DeepHermes models on Apple Silicon using the MLX framework. It supports memory-efficient loading options and enhanced reasoning capabilities.
 
-## Overview
+### Features
 
-This project provides a simple and efficient way to run the DeepHermes-3-Mistral-24B model locally on Apple Silicon devices using the MLX framework. The implementation is modular and follows best practices for Python code organization.
+- Run inference with DeepHermes-3-Llama-3-8B model on Apple Silicon
+- Interactive chat mode with history management
+- Memory-efficient options (quantization, lazy loading)
+- Enhanced reasoning capabilities with DeepHermes's specialized thinking process
+- Streaming text generation
 
-## Requirements
-
-- macOS running on Apple Silicon (M1/M2/M3)
-- Python 3.8+
-- MLX and MLX-LM libraries
-
-## Installation
+### Installation
 
 1. Clone this repository:
 ```bash
@@ -20,77 +18,118 @@ git clone https://github.com/jbarnes850/mlx-deephermes.git
 cd mlx-deephermes
 ```
 
-2. Create a virtual environment and install dependencies:
+2. Create and activate a virtual environment:
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
 pip install -r requirements.txt
 ```
 
-## Usage
+### Usage
 
-### Basic Inference
+#### Interactive Chat
 
-To run a simple inference with the model:
+The easiest way to interact with the model is through the chat interface:
 
 ```bash
-python main.py --prompt "Tell me about quantum computing" --reasoning
+python chat.py
 ```
 
-### Interactive Chat
+With memory optimization options:
 
-For an interactive chat experience:
+```bash
+python chat.py --quantize 4bit --lazy-load
+```
+
+With enhanced reasoning capabilities:
 
 ```bash
 python chat.py --reasoning
 ```
 
+#### Single Prompt Inference
+
+For single prompt inference, use the main script:
+
+```bash
+python main.py --prompt "Explain quantum computing in simple terms."
+```
+
+With memory optimization and reasoning:
+
+```bash
+python main.py --prompt "Explain quantum computing in simple terms." --quantize 4bit --reasoning
+```
+
 ### Command Line Options
 
-Both scripts support the following command line options:
+#### Model Options
+- `--model`: Model path or Hugging Face repo ID (default: "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16")
+- `--trust-remote-code`: Trust remote code in tokenizer
 
-- `--model`: Model path on Hugging Face Hub (default: "Jarrodbarnes/DeepHermes-3-Mistral-24B-Preview-mlx-fp16")
-- `--prompt`: Prompt to use for generation (for main.py)
+#### Generation Options
+- `--prompt`: Text prompt for generation
 - `--system-prompt`: System prompt to use (default: "You are DeepHermes, a helpful AI assistant.")
 - `--max-tokens`: Maximum number of tokens to generate (default: 1024)
 - `--temperature`: Sampling temperature (default: 0.7)
 - `--top-p`: Top-p sampling parameter (default: 0.9)
-- `--trust-remote-code`: Trust remote code in tokenizer
+- `--no-stream`: Disable streaming output
 - `--max-kv-size`: Maximum KV cache size for long context
-- `--reasoning`: Enable reasoning mode (adds reasoning instruction to system prompt)
-- `--no-stream`: Disable streaming output (for main.py)
+
+#### Reasoning Options
+- `--reasoning`: Enable DeepHermes reasoning mode
+
+#### Memory Optimization Options
+- `--quantize`: Quantize model to reduce memory usage (choices: "4bit", "8bit")
+- `--lazy-load`: Load model weights lazily to reduce memory usage
 
 ### Chat Commands
 
-In the interactive chat mode, you can use the following commands:
+During an interactive chat session, you can use the following commands:
 
-- `exit`: Quit the chat
+- `exit`: Quit the chat session
 - `clear`: Clear chat history
 - `system <prompt>`: Change the system prompt
+- `reasoning <on|off>`: Toggle reasoning mode on or off
 
-## Project Structure
+### DeepHermes Reasoning Capabilities
 
-- `model.py`: Model loading and configuration
-- `inference.py`: Inference functionality
-- `main.py`: Script for running single inferences
-- `chat.py`: Interactive chat interface
-- `requirements.txt`: Required Python packages
-
-## Original Model Information
-
-- Original model: [NousResearch/DeepHermes-3-Mistral-24B-Preview](https://huggingface.co/NousResearch/DeepHermes-3-Mistral-24B-Preview)
-- MLX version: [Jarrodbarnes/DeepHermes-3-Mistral-24B-Preview-mlx-fp16](https://huggingface.co/Jarrodbarnes/DeepHermes-3-Mistral-24B-Preview-mlx-fp16)
-
-## Performance Considerations
-
-For large models like DeepHermes-3-Mistral-24B, you may need to increase the system wired memory limit to improve performance:
+DeepHermes models are designed with enhanced reasoning capabilities. When the reasoning mode is enabled, the model uses the following specialized prompt:
 
 ```bash
-sudo sysctl iogpu.wired_limit_mb=N
+You are a deep thinking AI, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <think> </think> tags, and then provide your solution or response to the problem.
 ```
 
-Where N should be larger than the size of the model in megabytes but smaller than the memory size of your machine.
+This prompting technique enables the model to:
+1. Develop long chains of thought
+2. Deliberate with itself through systematic reasoning
+3. Enclose its internal thinking process in `<think>` tags
+4. Provide a well-reasoned solution after thorough consideration
 
-## License
+### Performance Considerations
 
-This project is released under the MIT License.
+The DeepHermes-3-Llama-3-8B model is optimized for Apple Silicon and should run efficiently on most modern Macs. For best performance:
+
+1. Use 4-bit quantization (`--quantize 4bit`) to significantly reduce memory usage
+2. Enable lazy loading (`--lazy-load`) to load weights on demand
+3. For older or memory-constrained devices, consider limiting the maximum tokens generated
+
+For very large models or long contexts, you may need to increase the system wired memory limit:
+
+```bash
+sudo sysctl iogpu.wired_limit_mb=32000
+```
+
+### License
+
+This project is provided as-is under the terms of the license of the underlying models and libraries.
+
+### Acknowledgments
+
+- [MLX Team at Apple](https://github.com/ml-explore/mlx) for the MLX framework
+- [MLX-LM](https://github.com/ml-explore/mlx-lm) for the LLM infrastructure
+- [DeepHermes Team](https://huggingface.co/mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16) for the model weights

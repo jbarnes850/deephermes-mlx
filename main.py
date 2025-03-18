@@ -1,5 +1,5 @@
 """
-Main script for running DeepHermes-3-Mistral-24B MLX inference.
+Main script for running DeepHermes-3-Llama-3-8B MLX inference.
 """
 import argparse
 from typing import Dict, Any, Optional
@@ -10,12 +10,12 @@ from inference import run_inference
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Run inference with DeepHermes-3-Mistral-24B MLX model")
+    parser = argparse.ArgumentParser(description="Run inference with DeepHermes-3-Llama-3-8B MLX model")
     
     parser.add_argument(
         "--model",
         type=str,
-        default="Jarrodbarnes/DeepHermes-3-Mistral-24B-Preview-mlx-fp16",
+        default="mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16",
         help="Model path on Hugging Face Hub"
     )
     parser.add_argument(
@@ -67,10 +67,44 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--reasoning",
         action="store_true",
-        help="Enable reasoning mode (adds 'Reasoning:' to system prompt)"
+        help="Enable DeepHermes reasoning mode (adds reasoning instruction to system prompt)"
+    )
+    parser.add_argument(
+        "--reasoning-depth",
+        type=str,
+        choices=["basic", "deep", "expert"],
+        default="deep",
+        help="Depth of reasoning when reasoning mode is enabled"
+    )
+    # Add memory-efficient options
+    parser.add_argument(
+        "--quantize",
+        type=str,
+        choices=["4bit", "8bit"],
+        default=None,
+        help="Quantize model to reduce memory usage (4bit or 8bit)"
+    )
+    parser.add_argument(
+        "--lazy-load",
+        action="store_true",
+        help="Load model weights lazily to reduce memory usage"
     )
     
     return parser.parse_args()
+
+
+def get_reasoning_prompt(depth: str) -> str:
+    """
+    Get the reasoning prompt based on the specified depth.
+    
+    Args:
+        depth: Depth of reasoning ('basic', 'deep', or 'expert')
+    
+    Returns:
+        Reasoning prompt to append to system prompt
+    """
+    # Use the official DeepHermes reasoning prompt
+    return " You are a deep thinking AI, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <think> </think> tags, and then provide your solution or response to the problem."
 
 
 def main() -> None:
@@ -85,8 +119,11 @@ def main() -> None:
     # Load model and tokenizer
     model, tokenizer = load_model(
         model_path=args.model,
+        quantize=args.quantize,
+        lazy_load=args.lazy_load,
         trust_remote_code=args.trust_remote_code,
-        tokenizer_config=tokenizer_config
+        tokenizer_config=tokenizer_config,
+        verbose=True
     )
     
     # Get user prompt if not provided
@@ -107,7 +144,8 @@ def main() -> None:
     # Modify system prompt for reasoning if enabled
     system_prompt = args.system_prompt
     if args.reasoning:
-        system_prompt += " Please think through this step by step and show your reasoning."
+        reasoning_prompt = get_reasoning_prompt(args.reasoning_depth)
+        system_prompt += reasoning_prompt
     
     # Run inference
     print("\n--- Model Output ---\n")

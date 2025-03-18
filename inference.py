@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from transformers import PreTrainedTokenizer
 from mlx_lm import generate, stream_generate
+from mlx_lm.sample_utils import make_sampler
 
 
 def format_prompt(
@@ -81,6 +82,13 @@ def run_inference(
     # Format the prompt
     formatted_prompt = format_prompt(tokenizer, prompt, system_prompt)
     
+    # Create a sampler function with the temperature and top_p parameters
+    sampler = make_sampler(temp=temperature, top_p=top_p)
+    
+    # Filter out parameters that are handled separately
+    filtered_kwargs = {k: v for k, v in kwargs.items() 
+                      if k not in ['temperature', 'top_p', 'max_tokens']}
+    
     # Generate text
     if stream:
         # Stream the output
@@ -88,11 +96,10 @@ def run_inference(
         for response in stream_generate(
             model,
             tokenizer,
-            prompt=formatted_prompt,
+            formatted_prompt,
             max_tokens=max_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            **kwargs
+            sampler=sampler,
+            **filtered_kwargs
         ):
             if verbose:
                 print(response.text, end="", flush=True)
@@ -103,7 +110,7 @@ def run_inference(
         
         return full_response
     else:
-        # Generate all at once
+        # Generate all at once - the generate function does accept temperature and top_p directly
         response = generate(
             model,
             tokenizer,
@@ -112,6 +119,6 @@ def run_inference(
             temperature=temperature,
             top_p=top_p,
             verbose=verbose,
-            **kwargs
+            **filtered_kwargs
         )
         return response
