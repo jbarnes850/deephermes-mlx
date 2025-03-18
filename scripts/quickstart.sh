@@ -7,6 +7,8 @@ TEST_OPTION=""
 TEST_DATASET=""
 TEST_NUM_EXAMPLES=""
 TEST_PROMPT=""
+SKIP_MODEL_SELECTION=false
+FORCE_MODEL_SIZE=""
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -21,6 +23,14 @@ while [[ $# -gt 0 ]]; do
       else
         shift 2
       fi
+      ;;
+    --skip-model-selection)
+      SKIP_MODEL_SELECTION=true
+      shift
+      ;;
+    --force-model)
+      FORCE_MODEL_SIZE="$2"
+      shift 2
       ;;
     *)
       shift
@@ -47,14 +57,44 @@ source venv/bin/activate
 echo "Installing dependencies..."
 pip install -r requirements.txt
 
-# Download the model
+# Use model selector to recommend the best model based on hardware
+if [ "$SKIP_MODEL_SELECTION" = false ]; then
+    echo ""
+    echo "🔍 Analyzing your hardware to recommend the optimal DeepHermes model..."
+    
+    # Run the model selector CLI to get a recommendation
+    if [ -n "$FORCE_MODEL_SIZE" ]; then
+        MODEL_CONFIG=$(python -m deephermes.model_selector.cli --force-model-size "$FORCE_MODEL_SIZE" --json)
+    else
+        MODEL_CONFIG=$(python -m deephermes.model_selector.cli --json)
+    fi
+    
+    # Parse the model ID from the JSON output
+    MODEL_ID=$(echo $MODEL_CONFIG | python -c "import sys, json; print(json.load(sys.stdin)['model_id'])")
+    QUANTIZATION=$(echo $MODEL_CONFIG | python -c "import sys, json; data=json.load(sys.stdin); print(data.get('quantization', 'none'))")
+    REASON=$(echo $MODEL_CONFIG | python -c "import sys, json; print(json.load(sys.stdin)['reason'])")
+    
+    echo "✅ Recommendation: $MODEL_ID"
+    echo "📝 $REASON"
+    
+    if [ "$QUANTIZATION" != "none" ]; then
+        echo "🔧 Using $QUANTIZATION quantization for optimal performance on your hardware."
+    fi
+else
+    # Default model if model selection is skipped
+    MODEL_ID="mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16"
+    echo ""
+    echo "Using default model: $MODEL_ID"
+fi
+
+# Download the recommended model
 echo ""
-echo "Downloading the DeepHermes-3-Llama-3-8B model (this may take a few minutes)..."
-python -c "from transformers import AutoTokenizer; from mlx_lm import load; model, tokenizer = load('mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16'); print('Model downloaded successfully!')"
+echo "Downloading the model (this may take a few minutes)..."
+python -c "from transformers import AutoTokenizer; from mlx_lm import load; model, tokenizer = load('$MODEL_ID'); print('Model downloaded successfully!')"
 
 # Print success message
 echo ""
-echo "🎉 Setup complete! DeepHermes-3-Llama-3-8B is ready to use."
+echo "🎉 Setup complete! $MODEL_ID is ready to use."
 echo ""
 
 # Present options to the user
@@ -77,7 +117,7 @@ case $choice in
         echo "Type 'exit' to quit or 'help' to see available commands."
         echo ""
         # Launch the chat interface with reasoning mode
-        python chat.py --reasoning
+        python chat.py --reasoning --model "$MODEL_ID"
         ;;
     2)
         echo ""
@@ -100,29 +140,29 @@ case $choice in
             echo "Using the Alpaca dataset for instruction tuning."
         else
             if [ "$TEST_MODE" = false ]; then
-              read -p "Enter the path to your custom dataset: " custom_dataset
-              dataset="$custom_dataset"
+              read -p "Enter the path to your dataset: " dataset
             else
               dataset=$TEST_DATASET
-              echo "Using custom dataset: $dataset"
+              echo "Using dataset: $dataset"
             fi
         fi
         
         # Ask for number of examples
         if [ "$TEST_MODE" = false ]; then
-          read -p "How many examples to use for fine-tuning? (default: 100, use fewer for testing): " num_examples
+          read -p "How many examples to use (default: 100): " num_examples
           num_examples=${num_examples:-100}
         else
           num_examples=$TEST_NUM_EXAMPLES
-          echo "Number of examples: $num_examples"
+          echo "Using $num_examples examples"
         fi
         
         # Confirm and run
         echo ""
-        echo "Ready to fine-tune DeepHermes-3-Llama-3-8B with the following settings:"
+        echo "Ready to fine-tune $MODEL_ID with the following settings:"
         echo "- Dataset: $dataset"
         echo "- Number of examples: $num_examples"
         echo ""
+        
         if [ "$TEST_MODE" = false ]; then
           read -p "Proceed with fine-tuning? (y/n): " confirm
         else
@@ -132,28 +172,27 @@ case $choice in
         
         if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
             # Run fine-tuning
-            ./scripts/finetune_mlx.sh --model "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16" \
+            ./scripts/finetune_mlx.sh --model "$MODEL_ID" \
                 --dataset-name "$dataset" \
                 --num-examples "$num_examples" \
                 --prepare-data --train
             
-            # Ask if user wants to test the model
-            echo ""
+            # Ask if user wants to generate with the fine-tuned model
             if [ "$TEST_MODE" = false ]; then
-              read -p "Would you like to test the fine-tuned model with a prompt? (y/n): " test_model
+                read -p "Generate text with your fine-tuned model? (y/n): " generate
             else
-              test_model="y"
-              echo "Testing the fine-tuned model..."
+                generate="y"
+                echo "Generating text with fine-tuned model..."
             fi
             
-            if [ "$test_model" = "y" ] || [ "$test_model" = "Y" ]; then
+            if [ "$generate" = "y" ] || [ "$generate" = "Y" ]; then
                 if [ "$TEST_MODE" = false ]; then
                   read -p "Enter your prompt: " prompt
                 else
                   prompt="$TEST_PROMPT"
                   echo "Using prompt: $prompt"
                 fi
-                ./scripts/finetune_mlx.sh --model "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16" \
+                ./scripts/finetune_mlx.sh --model "$MODEL_ID" \
                     --prompt "$prompt" \
                     --generate
             fi
@@ -168,21 +207,14 @@ case $choice in
         
         # Check if model path is provided
         if [ "$TEST_MODE" = false ]; then
-            read -p "Do you want to start a new server with a model? (y/n): " start_server
+            read -p "Do you want to start a new server with the recommended model? (y/n): " start_server
         else
             start_server="n"
             echo "Using existing server..."
         fi
         
         if [ "$start_server" = "y" ] || [ "$start_server" = "Y" ]; then
-            if [ "$TEST_MODE" = false ]; then
-                read -p "Enter the path to your model: " model_path
-            else
-                model_path="mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16"
-                echo "Using model: $model_path"
-            fi
-            
-            server_args="--model $model_path --start-server"
+            server_args="--model $MODEL_ID --start-server"
         else
             if [ "$TEST_MODE" = false ]; then
                 read -p "Enter the host (default: 127.0.0.1): " host

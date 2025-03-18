@@ -11,7 +11,7 @@
 
 DeepHermes MLX provides a complete end-to-end workflow for working with large language models on Apple Silicon:
 
-1. **Model Selector** - Choose a DeepHermes model based on your hardware
+1. **Model Selector** - Optimized selection of a DeepHermes model based on your hardware
 2. **Inference** - Run inference with DeepHermes models
 3. **Fine-tune** - Customize models on your data using efficient LoRA fine-tuning
 4. **Export** - Optimize models with quantization for deployment

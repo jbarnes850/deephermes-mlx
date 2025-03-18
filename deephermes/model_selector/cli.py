@@ -63,6 +63,12 @@ def parse_args() -> argparse.Namespace:
         help="Force a specific model size regardless of hardware"
     )
     
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output the recommendation in JSON format for programmatic use"
+    )
+    
     return parser.parse_args()
 
 
@@ -87,16 +93,17 @@ def main() -> None:
     # Get hardware information
     hardware_info = get_hardware_info()
     
-    # Print hardware information
-    print("===== Hardware Information =====")
-    print(f"Device: {hardware_info.device_name}")
-    print(f"Chip: {hardware_info.chip_type}")
-    print(f"Memory: {hardware_info.memory_gb:.1f} GB")
-    print(f"CPU Cores: {hardware_info.cpu_cores}")
-    
-    if hardware_info.is_apple_silicon:
-        print(f"GPU Cores: {hardware_info.gpu_cores}")
-        print(f"Neural Engine Cores: {hardware_info.neural_engine_cores}")
+    # Print hardware information if not in JSON mode
+    if not args.json:
+        print("===== Hardware Information =====")
+        print(f"Device: {hardware_info.device_name}")
+        print(f"Chip: {hardware_info.chip_type}")
+        print(f"Memory: {hardware_info.memory_gb:.1f} GB")
+        print(f"CPU Cores: {hardware_info.cpu_cores}")
+        
+        if hardware_info.is_apple_silicon:
+            print(f"GPU Cores: {hardware_info.gpu_cores}")
+            print(f"Neural Engine Cores: {hardware_info.neural_engine_cores}")
     
     # Save hardware information if requested
     if args.save_hardware_info:
@@ -231,7 +238,20 @@ def main() -> None:
                               " configured based on available memory."
     
     # Print recommendation
-    print_recommendation(recommendation)
+    if args.json:
+        config = recommendation.model_config
+        output = {
+            "model_id": config.model_id,
+            "quantization": config.quantization,
+            "lazy_load": config.lazy_load,
+            "max_tokens": config.max_tokens,
+            "reasoning": True,
+            "reason": recommendation.reason,
+            "confidence": recommendation.confidence
+        }
+        print(json.dumps(output))
+    else:
+        print_recommendation(recommendation)
     
     # Save configuration if requested
     if args.save_config:
