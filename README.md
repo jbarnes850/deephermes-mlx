@@ -10,6 +10,26 @@ This repository contains a Python implementation for running inference with Deep
 - Enhanced reasoning capabilities with DeepHermes's specialized thinking process
 - Streaming text generation
 
+### Quick Start
+
+The fastest way to get started is to use the provided quickstart script:
+
+```bash
+# Make the script executable if needed
+chmod +x quickstart.sh
+
+# Run the quickstart script
+./quickstart.sh
+```
+
+This will:
+- Set up a virtual environment
+- Install dependencies
+- Download the DeepHermes-3-Llama-3-8B model
+- Provide instructions for running the model
+
+After running the quickstart script, you'll be ready to use the model immediately without any additional setup.
+
 ### Installation
 
 1. Clone this repository:
@@ -109,6 +129,10 @@ This prompting technique enables the model to:
 2. Deliberate with itself through systematic reasoning
 3. Enclose its internal thinking process in `<think>` tags
 4. Provide a well-reasoned solution after thorough consideration
+
+### Examples
+
+For a collection of example prompts and use cases to help you get started, see the [examples.md](examples.md) file.
 
 ### Performance Considerations
 

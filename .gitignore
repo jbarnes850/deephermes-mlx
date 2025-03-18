@@ -1,8 +1,48 @@
-venv
-__pycache__
-*.pyc
-*.pyo
-*.pyd
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
 *.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environments
 .env
-.egg-info
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# MLX specific
+*.mlx.safetensors
+*.mlx.bin
