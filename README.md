@@ -18,22 +18,6 @@ DeepHermes MLX provides a complete end-to-end workflow for working with large la
 5. **Serve** - Deploy models locally with an OpenAI-compatible API
 6. **Integrate** - Connect with applications and frameworks
 
-```mermaid
-flowchart LR
-    classDef primary fill:#6366F1,color:white,stroke:none
-    classDef secondary fill:#10B981,color:white,stroke:none
-    classDef accent fill:#F43F5E,color:white,stroke:none
-    
-    A[Fine-tune] -->|LoRA| B[Export]
-    B -->|Quantize| C[Serve]
-    C -->|API| D[Integrate]
-    
-    class A primary
-    class B secondary
-    class C secondary
-    class D accent
-```
-
 ## Overview
 
 ```mermaid
@@ -94,8 +78,6 @@ This will:
 - Install dependencies
 - Download the DeepHermes model
 - Provide instructions for running the model
-
-After running the quickstart script, you'll be ready to use the model immediately without any additional setup.
 
 ## Fine-tuning
 
@@ -160,35 +142,159 @@ The server provides the following OpenAI-compatible endpoints:
 - `/v1/chat/completions`: Generate chat completions
 - `/v1/embeddings`: Generate embeddings (if supported by the model)
 
+## LangChain Integration
+
+DeepHermes MLX provides seamless integration with LangChain, allowing you to use your DeepHermes models with LangChain's ecosystem of tools and frameworks for building LLM-powered applications.
+
+### Getting Started
+
+There are two ways to use the LangChain integration:
+
+1. **Start a new server with a model**:
+   ```bash
+   # Start a new server with a model and launch the example
+   ./scripts/quickstart.sh --langchain --model mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16
+   ```
+
+2. **Connect to an existing server**:
+   ```bash
+   # First start the MLX-LM server
+   venv/bin/mlx_lm.server --model mlx-community/Phi-3-mini-4k-instruct-4bit --host 127.0.0.1 --port 8080
+   
+   # In a separate terminal, run the LangChain example
+   venv/bin/python examples/langchain_example.py --host 127.0.0.1 --port 8080 --example llm
+   ```
+
+### Example Modes
+
+The LangChain integration supports three main usage modes:
+
+1. **LLM Mode** - Basic text generation:
+   ```bash
+   venv/bin/python examples/langchain_example.py --host 127.0.0.1 --port 8080 --example llm
+   ```
+
+2. **Chat Mode** - Interactive chat with message history:
+   ```bash
+   venv/bin/python examples/langchain_example.py --host 127.0.0.1 --port 8080 --example chat
+   ```
+
+3. **Chain Mode** - Composable LangChain chains:
+   ```bash
+   venv/bin/python examples/langchain_example.py --host 127.0.0.1 --port 8080 --example chain
+   ```
+
+### Key Features
+
+- **LLM Integration**: Use DeepHermes models with LangChain's LLM interfaces
+- **Chat Model Support**: Interact with DeepHermes models using LangChain's chat interfaces
+- **Streaming Support**: Stream responses for real-time feedback
+- **Server Management**: Automatically start and manage the MLX-LM server
+- **CLI Interface**: Simple command-line interface for common use cases
+- **Compatible with Multiple Models**: Works with any model supported by MLX-LM server
+
 ### Programmatic Usage
 
 ```python
-import requests
+# Using DeepHermes as a LangChain LLM
+from deephermes.integrate.langchain import DeepHermesLLM
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
-# Generate text completion
-response = requests.post(
-    "http://localhost:8080/v1/completions",
-    json={
-        "prompt": "Explain quantum computing in simple terms:",
-        "max_tokens": 200,
-        "temperature": 0.7
-    }
-)
-print(response.json()["choices"][0]["text"])
+# Connect to an existing server
+llm = DeepHermesLLM(host="127.0.0.1", port=8080)
 
-# Generate chat completion
-response = requests.post(
-    "http://localhost:8080/v1/chat/completions",
-    json={
-        "model": "default_model",
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": "Explain quantum computing in simple terms."}
-        ],
-        "temperature": 0.7
-    }
+# Or start a new server with a model
+llm = DeepHermesLLM(
+    model_path="/path/to/model",
+    start_server=True,
+    temperature=0.7,
+    max_tokens=512
 )
-print(response.json()["choices"][0]["message"]["content"])
+
+# Create a simple chain
+template = """
+You are an expert in {topic}.
+
+Explain the following concept in simple terms: {concept}
+
+Your explanation should be:
+- Clear and concise
+- Understandable by a beginner
+- Include 3 key points
+"""
+
+prompt = PromptTemplate.from_template(template)
+chain = prompt | llm | StrOutputParser()
+
+# Run the chain
+result = chain.invoke({
+    "topic": "quantum physics",
+    "concept": "wave-particle duality"
+})
+print(result)
+
+# Using DeepHermes as a LangChain Chat Model
+from deephermes.integrate.langchain import ChatDeepHermes
+from langchain_core.messages import HumanMessage, SystemMessage
+
+# Create a chat model
+chat = ChatDeepHermes(
+    host="127.0.0.1", 
+    port=8080
+)
+
+# Create messages
+messages = [
+    SystemMessage(content="You are a helpful assistant specialized in quantum physics."),
+    HumanMessage(content="Explain quantum entanglement in simple terms.")
+]
+
+# Get a response
+response = chat.invoke(messages)
+print(response.content)
+
+### Troubleshooting
+
+If you encounter issues with the LangChain integration, try these steps:
+
+1. **Check server status**: Ensure the MLX-LM server is running and accessible
+   ```bash
+   curl http://127.0.0.1:8080/v1/models
+   ```
+
+2. **Verify model availability**: Make sure the model is properly loaded
+   ```bash
+   curl http://127.0.0.1:8080/status
+   ```
+
+3. **Start server manually**: If automatic server start fails, start it manually
+   ```bash
+   venv/bin/mlx_lm.server --model <model_name> --host 127.0.0.1 --port 8080
+   ```
+
+4. **Check model compatibility**: Not all models work with all features. Try using a different model if you encounter issues.
+
+### Advanced Usage
+
+The LangChain integration supports all the features of the MLX-LM server, including:
+
+- **Adapter Support**: Use fine-tuned adapters with your base model
+- **Quantization**: Use quantized models for faster inference
+- **Custom Chat Templates**: Use custom chat templates for specialized models
+- **Memory-Efficient Inference**: Configure cache limits for memory-constrained environments
+
+```python
+# Advanced configuration
+from deephermes.integrate.langchain import DeepHermesLLM
+
+llm = DeepHermesLLM(
+    model_path="/path/to/base/model",
+    adapter_path="/path/to/adapter",
+    cache_limit_gb=4,
+    start_server=True,
+    temperature=0.7
+)
 ```
 
 ## Installation

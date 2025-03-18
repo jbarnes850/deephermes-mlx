@@ -1,3 +1,7 @@
 mlx-lm>=0.22.0
 mlx>=0.22.0
 transformers>=4.39.3
+langchain-core>=0.1.0
+langchain>=0.1.0
+requests>=2.31.0
+pydantic>=2.0.0

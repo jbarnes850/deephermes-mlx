@@ -61,9 +61,10 @@ echo ""
 echo "What would you like to do?"
 echo "1. Launch chat interface with reasoning"
 echo "2. Fine-tune a reasoning model"
+echo "3. Use LangChain integration"
 echo ""
 if [ "$TEST_MODE" = false ]; then
-  read -p "Enter your choice (1 or 2): " choice
+  read -p "Enter your choice (1-3): " choice
 else
   choice=$TEST_OPTION
   echo "Selected option: $choice"
@@ -159,6 +160,98 @@ case $choice in
         else
             echo "Fine-tuning cancelled."
         fi
+        ;;
+    3)
+        echo ""
+        echo "Starting LangChain integration..."
+        echo ""
+        
+        # Check if model path is provided
+        if [ "$TEST_MODE" = false ]; then
+            read -p "Do you want to start a new server with a model? (y/n): " start_server
+        else
+            start_server="n"
+            echo "Using existing server..."
+        fi
+        
+        if [ "$start_server" = "y" ] || [ "$start_server" = "Y" ]; then
+            if [ "$TEST_MODE" = false ]; then
+                read -p "Enter the path to your model: " model_path
+            else
+                model_path="mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16"
+                echo "Using model: $model_path"
+            fi
+            
+            server_args="--model $model_path --start-server"
+        else
+            if [ "$TEST_MODE" = false ]; then
+                read -p "Enter the host (default: 127.0.0.1): " host
+                host=${host:-127.0.0.1}
+                
+                read -p "Enter the port (default: 8080): " port
+                port=${port:-8080}
+            else
+                host="127.0.0.1"
+                port="8080"
+                echo "Using host: $host, port: $port"
+            fi
+            
+            server_args="--host $host --port $port"
+        fi
+        
+        # Ask for the LangChain mode
+        if [ "$TEST_MODE" = false ]; then
+            echo ""
+            echo "Select LangChain mode:"
+            echo "1. Chat interface"
+            echo "2. Text generation"
+            echo "3. Chain example"
+            read -p "Enter your choice (1-3): " lc_mode
+        else
+            lc_mode="1"
+            echo "Using chat interface mode"
+        fi
+        
+        case $lc_mode in
+            1)
+                echo ""
+                echo "Starting chat interface..."
+                ./scripts/integrate.sh $server_args chat
+                ;;
+            2)
+                if [ "$TEST_MODE" = false ]; then
+                    read -p "Enter your prompt: " prompt
+                else
+                    prompt="Explain quantum computing in simple terms"
+                    echo "Using prompt: $prompt"
+                fi
+                
+                echo ""
+                echo "Generating text..."
+                ./scripts/integrate.sh $server_args generate --prompt "$prompt"
+                ;;
+            3)
+                if [ "$TEST_MODE" = false ]; then
+                    read -p "Enter a topic (default: artificial intelligence): " topic
+                    topic=${topic:-"artificial intelligence"}
+                    
+                    read -p "Enter a concept to explain (default: neural networks): " concept
+                    concept=${concept:-"neural networks"}
+                else
+                    topic="artificial intelligence"
+                    concept="neural networks"
+                    echo "Using topic: $topic, concept: $concept"
+                fi
+                
+                echo ""
+                echo "Running chain example..."
+                ./scripts/integrate.sh $server_args chain --topic "$topic" --concept "$concept"
+                ;;
+            *)
+                echo "Invalid choice. Using chat interface."
+                ./scripts/integrate.sh $server_args chat
+                ;;
+        esac
         ;;
     *)
         echo "Invalid choice. Exiting."
