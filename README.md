@@ -1,4 +1,4 @@
-# DeepHermes MLX Inference
+# DeepHermes MLX
 
 This repository contains a Python implementation for running inference with DeepHermes models on Apple Silicon using the MLX framework. It supports memory-efficient loading options, enhanced reasoning capabilities, comprehensive benchmarking, and adaptive model selection.
 
