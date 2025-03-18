@@ -15,6 +15,8 @@ flowchart TD
     classDef primary fill:#6366F1,color:white,stroke:none
     classDef secondary fill:#10B981,color:white,stroke:none
     classDef accent fill:#F43F5E,color:white,stroke:none
+    classDef export fill:#F59E0B,color:white,stroke:none
+    classDef deploy fill:#EC4899,color:white,stroke:none
     classDef default fill:#1A1D24,color:#F8FAFC,stroke:none
 
     A[Hardware Detection] --> B[Model Selector]
@@ -24,7 +26,16 @@ flowchart TD
     E -->|Evaluate| F[Benchmark Suite]
     F -->|Feedback| C
     
+    C -->|Fine-tune| G[LoRA Adapter]
+    G -->|Export| H[Quantized Model]
+    H -->|Serve| I[Local API]
+    I -->|Integrate| J[Workflows]
+    
     class C primary
+    class G secondary
+    class H export
+    class I deploy
+    class J accent
 ```
 
 ### Features
@@ -35,6 +46,8 @@ flowchart TD
 - Enhanced reasoning capabilities with DeepHermes's specialized thinking process
 - Streaming text generation
 - **LoRA Fine-tuning** for customizing models on your own data
+- **Model Export & Quantization** for optimized deployment
+- **Local Model Serving** via API endpoints
 - **Multi-Model Benchmark Suite** for evaluating model performance
 - **Adaptive Model Selector** for optimal configuration based on hardware
 
@@ -312,6 +325,36 @@ print(f"Quantization: {config['quantize']}")
 print(f"Lazy loading: {config['lazy_load']}")
 ```
 
+## Model Compatibility
+
+DeepHermes MLX is compatible with a wide range of MLX models, including:
+
+- DeepHermes models (3B, 8B, 24B)
+- Mistral models (7B, 24B)
+- Llama models (2 and 3 series)
+- Gemma models
+- And many more
+
+### Adding Custom Compatible Models
+
+If you want to use a model that's not in our pre-defined compatibility list, you can add it in two ways:
+
+1. **Environment Variable**:
+   ```bash
+   # Add multiple models separated by commas
+   export MLX_COMPATIBLE_MODELS="org/model-name-1,org/model-name-2"
+   ```
+
+2. **Configuration File**:
+   Create a file at `~/.config/deephermes/compatible_models.txt` with one model per line:
+   ```
+   # My custom MLX-compatible models
+   org/model-name-1
+   org/model-name-2
+   ```
+
+This is particularly useful as new MLX models are released frequently.
+
 ## Multi-Model Benchmark Suite
 
 ```mermaid
@@ -371,6 +414,56 @@ benchmark
 | DeepHermes-3B | 58.2 | 35.7 | 6 |
 | DeepHermes-8B | 67.5 | 22.3 | 16 |
 | DeepHermes-24B | 76.8 | 9.1 | 48 |
+
+## Model Export & Deployment
+
+DeepHermes MLX supports exporting and deploying fine-tuned models for production use.
+
+### Exporting Models
+
+Export your fine-tuned model with optional quantization for optimized deployment:
+
+```bash
+./scripts/export_model.sh --model ./fine_tuned_model --quantize int8
+```
+
+Options:
+- `--model`: Path to model or adapter weights
+- `--base-model`: Path to base model (required when using adapters)
+- `--output`: Output directory (default: ./exported_model)
+- `--quantize`: Quantization precision (int8, int4, fp16, none)
+- `--format`: Output format (mlx, gguf)
+- `--validate`: Validate the exported model
+
+Example with adapter:
+```bash
+./scripts/export_model.sh \
+  --model ./adapters \
+  --base-model mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16 \
+  --quantize int8 \
+  --validate
+```
+
+Quantization reduces model size and improves inference speed:
+- **INT8**: Balanced performance and quality (4x smaller)
+- **INT4**: Fastest, smallest size (8x smaller)
+- **FP16**: Highest quality (2x smaller than FP32)
+
+### Programmatic Usage
+
+```python
+from deephermes.export import quantize_model, save_quantized_model
+from deephermes.core.model import load_model
+
+# Load model
+model = load_model("./fine_tuned_model")
+
+# Quantize model
+quantized_model = quantize_model(model, precision="int8")
+
+# Save quantized model
+save_quantized_model(quantized_model, "./exported_model")
+```
 
 ## Contributing
 
