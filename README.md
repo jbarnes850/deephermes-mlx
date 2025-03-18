@@ -126,7 +126,7 @@ sudo sysctl iogpu.wired_limit_mb=32000
 
 ### License
 
-This project is provided as-is under the terms of the license of the underlying models and libraries.
+MIT License see [LICENSE](LICENSE)
 
 ### Acknowledgments
 
