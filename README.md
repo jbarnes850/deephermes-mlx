@@ -4,12 +4,13 @@
   <img src="assets/images/deephermes.jpeg" alt="DeepHermes Logo" width="600"/>
 </div>
 
-> **Vision**: Can we build a world where AI adapts to your hardware, keeps data private, turns ordinary devices into networked compute clusters, and integrates seamlessly with existing workflows? DeepHermes MLX is a small step toward this vision by providing high-performance local inference for DeepHermes reasoning models.
+> **Vision**: Can we build a world where AI adapts to your hardware, keeps data private, turns ordinary devices into networked compute clusters, and integrates seamlessly with existing workflows?
 
+### The Adaptive ML Workflow
+
+We believe that the **Adaptive ML Workflow** is a dynamic approach that intelligently configures every aspect of the ML pipeline based on your specific hardware capabilities. DeepHermes MLX understands your hardware and builds workflows optimized for you.
 
 ## End-to-End Workflow
-
-DeepHermes MLX provides a complete end-to-end workflow for working with large language models on Apple Silicon:
 
 1. **Model Selector** - Optimized selection of a DeepHermes model based on your hardware
 2. **Inference** - Run inference with DeepHermes models
