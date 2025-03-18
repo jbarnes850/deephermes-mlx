@@ -127,8 +127,6 @@ python main.py --prompt "Explain quantum computing in simple terms." --quantize 
 - `--prompt`: Text prompt for generation
 - `--system-prompt`: System prompt to use (default: "You are DeepHermes, a helpful AI assistant.")
 - `--max-tokens`: Maximum number of tokens to generate (default: 1024)
-- `--temperature`: Sampling temperature (default: 0.7)
-- `--top-p`: Top-p sampling parameter (default: 0.9)
 - `--no-stream`: Disable streaming output
 - `--max-kv-size`: Maximum KV cache size for long context
 
