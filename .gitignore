@@ -60,3 +60,8 @@ plan.md
 /test_adapter
 /exported_demo_model
 data/alpaca_data.json
+
+# Exported model
+/test_exported_model
+/test_model
+.server_info.json

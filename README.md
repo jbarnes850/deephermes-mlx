@@ -6,7 +6,33 @@
 
 > **Vision**: Can we build a world where AI adapts to your hardware, keeps data private, turns ordinary devices into networked compute clusters, and integrates seamlessly with existing workflows? DeepHermes MLX is a small step toward this vision by providing high-performance local inference for DeepHermes reasoning models.
 
-This repository contains a Python implementation for running inference with DeepHermes models on Apple Silicon using the MLX framework. It supports memory-efficient loading options, enhanced reasoning capabilities, comprehensive benchmarking, and adaptive model selection.
+
+## End-to-End Workflow
+
+DeepHermes MLX provides a complete end-to-end workflow for working with large language models on Apple Silicon:
+
+1. **Model Selector** - Choose a DeepHermes model based on your hardware
+2. **Inference** - Run inference with DeepHermes models
+3. **Fine-tune** - Customize models on your data using efficient LoRA fine-tuning
+4. **Export** - Optimize models with quantization for deployment
+5. **Serve** - Deploy models locally with an OpenAI-compatible API
+6. **Integrate** - Connect with applications and frameworks
+
+```mermaid
+flowchart LR
+    classDef primary fill:#6366F1,color:white,stroke:none
+    classDef secondary fill:#10B981,color:white,stroke:none
+    classDef accent fill:#F43F5E,color:white,stroke:none
+    
+    A[Fine-tune] -->|LoRA| B[Export]
+    B -->|Quantize| C[Serve]
+    C -->|API| D[Integrate]
+    
+    class A primary
+    class B secondary
+    class C secondary
+    class D accent
+```
 
 ## Overview
 
@@ -96,6 +122,74 @@ DeepHermes MLX supports efficient fine-tuning of models on Apple Silicon using L
 - **HuggingFace Dataset Integration**: Easily use datasets from the HuggingFace Hub
 - **Modular Workflow**: Prepare data, train, evaluate, and generate text in separate steps
 - **Apple Silicon Optimization**: Designed for high performance on M-series chips
+
+## Model Serving
+
+DeepHermes MLX includes a serve module that allows you to deploy your models with an OpenAI-compatible API server. This enables seamless integration with existing tools and applications that support the OpenAI API.
+
+### Serving Workflow
+
+```bash
+# Start the server with a model
+./scripts/serve_model.sh start --model /path/to/exported/model
+
+# Check server status
+./scripts/serve_model.sh status
+
+# Test the server with a prompt
+./scripts/serve_model.sh test --prompt "Explain quantum computing in simple terms"
+
+# Stop the server
+./scripts/serve_model.sh stop
+```
+
+### Key Features
+
+- **OpenAI API Compatibility**: Drop-in replacement for OpenAI API clients
+- **Local Deployment**: Keep your data private by running everything locally
+- **Streaming Support**: Real-time text generation with streaming responses
+- **Configuration Options**: Customize host, port, and model parameters
+- **MLX Optimization**: Leverages MLX for high-performance inference on Apple Silicon
+
+### API Endpoints
+
+The server provides the following OpenAI-compatible endpoints:
+
+- `/v1/models`: List available models
+- `/v1/completions`: Generate text completions
+- `/v1/chat/completions`: Generate chat completions
+- `/v1/embeddings`: Generate embeddings (if supported by the model)
+
+### Programmatic Usage
+
+```python
+import requests
+
+# Generate text completion
+response = requests.post(
+    "http://localhost:8080/v1/completions",
+    json={
+        "prompt": "Explain quantum computing in simple terms:",
+        "max_tokens": 200,
+        "temperature": 0.7
+    }
+)
+print(response.json()["choices"][0]["text"])
+
+# Generate chat completion
+response = requests.post(
+    "http://localhost:8080/v1/chat/completions",
+    json={
+        "model": "default_model",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Explain quantum computing in simple terms."}
+        ],
+        "temperature": 0.7
+    }
+)
+print(response.json()["choices"][0]["message"]["content"])
+```
 
 ## Installation
 
@@ -192,6 +286,9 @@ During an interactive chat session, you can use the following commands:
 - `benchmark [options]`: Run benchmark with optional custom settings
 - `recommend`: Get model recommendations based on your hardware
 - `switch <model>`: Switch to a different model (e.g., `switch 3b`, `switch 8b`, `switch 24b`)
+- `serve start`: Start a model server with the current model
+- `serve status`: Check the status of the running server
+- `serve stop`: Stop the running server
 
 ## Model Selector with Adaptive Loading
 
