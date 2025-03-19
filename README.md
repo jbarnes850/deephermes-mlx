@@ -10,14 +10,59 @@
 
 We believe that the **Adaptive ML Workflow** is a dynamic approach that intelligently configures every aspect of the ML pipeline based on your specific hardware capabilities. DeepHermes MLX understands your hardware and builds workflows optimized for you.
 
-## End-to-End Workflow
+### Key Features
 
-1. **Model Selector** - Optimized selection of a DeepHermes model based on your hardware
-2. **Inference** - Run inference with DeepHermes models
-3. **Fine-tune** - Customize models on your data using efficient LoRA fine-tuning
-4. **Export** - Optimize models with quantization for deployment
-5. **Serve** - Deploy models locally with an OpenAI-compatible API
-6. **Integrate** - Connect with applications and frameworks
+- **Hardware Detection**: Automatically detects and profiles your Apple Silicon hardware
+- **Intelligent Configuration**: Optimizes model selection, fine-tuning, serving, and integration parameters
+- **Performance Prioritization**: Choose between speed, quality, or balanced configurations
+- **Visual Dashboard**: Monitor hardware capabilities and performance metrics
+- **Configuration Management**: Save and load configurations for reproducibility
+
+### Getting Started
+
+```bash
+# Run with default settings (balanced performance on general workflow)
+./scripts/adaptive_workflow.sh
+
+# Prioritize speed for content creation workflow
+./scripts/adaptive_workflow.sh --workflow content_creation --prioritize speed
+
+# Prioritize quality for research workflow
+./scripts/adaptive_workflow.sh --workflow research --prioritize quality
+
+# Limit memory usage to 60% of available memory
+./scripts/adaptive_workflow.sh --max-memory 60
+
+# Save configuration for later use
+./scripts/adaptive_workflow.sh --save-config my_config.json
+
+# Load a saved configuration
+./scripts/adaptive_workflow.sh --load-config my_config.json
+
+# View hardware and performance dashboard
+./scripts/adaptive_workflow.sh --dashboard
+
+# Output configuration in JSON format
+./scripts/adaptive_workflow.sh --json
+```
+
+### Workflow Types
+
+The Adaptive ML Workflow supports different workflow types, each with optimized configurations:
+
+- **General**: Balanced configuration for general-purpose use
+- **Content Creation**: Optimized for generating creative content
+- **Coding**: Specialized for code generation and completion
+- **Research**: Focused on high-quality, in-depth responses
+
+### Integration with Other Components
+
+The Adaptive ML Workflow integrates seamlessly with other DeepHermes MLX components:
+
+- **Model Selector**: Recommends the optimal model based on your hardware
+- **Fine-tuning**: Configures fine-tuning parameters for efficient training
+- **Serving**: Sets up the optimal serving configuration for your hardware as a local API. You can also export the model for deployment.
+- **LangChain Integration**: Configures integration parameters for optimal performance
 
 ## Overview
 
