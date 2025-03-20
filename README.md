@@ -4,11 +4,56 @@
   <img src="assets/images/deephermes.jpeg" alt="DeepHermes Logo" width="600"/>
 </div>
 
+> [DeepHermes](https://huggingface.co/collections/nous-research/deephermes-65d9b6f4a3b3d9c2f8c0ae9f) by Nous Research
+
 > **Vision**: Can we build a world where AI adapts to your hardware, keeps data private, turns ordinary devices into networked compute clusters, and integrates seamlessly with existing workflows?
 
 ### The Adaptive ML Workflow
 
 We believe that the **Adaptive ML Workflow** is a dynamic approach that intelligently configures every aspect of the ML pipeline based on your specific hardware capabilities. DeepHermes MLX understands your hardware and builds workflows optimized for you.
+
+## Installation
+
+1. Clone this repository:
+```bash
+git clone https://github.com/jbarnes850/mlx-deephermes.git
+cd mlx-deephermes
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+## Quick Start
+
+The fastest way to get started is to use the provided quickstart script:
+
+```bash
+# Make the script executable if needed
+chmod +x quickstart.sh
+
+# Run the quickstart script
+./quickstart.sh
+```
+
+This will:
+- Set up a virtual environment
+- Install dependencies
+- Download the DeepHermes model optimized for your hardware
+- Provide options to:
+  - Launch an interactive chat interface
+  - Fine-tune a model with your data
+  - Use LangChain integration
+  - **Run adaptive workflows** that automatically configure for your hardware
+
+The adaptive workflows feature is core to DeepHermes MLX, intelligently adapting to your specific hardware capabilities to maximize performance while maintaining privacy. Choose from specialized workflows (General, Content Creation, Coding, Research) that configure every aspect of the ML pipeline based on your device's capabilities and your performance priorities.
 
 ### Key Features
 
@@ -19,41 +64,6 @@ We believe that the **Adaptive ML Workflow** is a dynamic approach that intellig
 - **Configuration Management**: Save and load configurations for reproducibility
 
 ### Getting Started
-
-```bash
-# Configure a general workflow (without running it)
-./scripts/adaptive_workflow.sh configure --workflow general
-
-# Run a content creation workflow
-./scripts/adaptive_workflow.sh run --workflow content_creation
-
-# Prioritize speed for coding workflow
-./scripts/adaptive_workflow.sh run --workflow coding --prioritize speed
-
-# Prioritize quality for research workflow
-./scripts/adaptive_workflow.sh run --workflow research --prioritize quality
-
-# Limit memory usage to 60% of available memory
-./scripts/adaptive_workflow.sh run --max-memory 60
-
-# Save configuration for later use
-./scripts/adaptive_workflow.sh configure --workflow general --save-config my_config.json
-
-# Run with a saved configuration
-./scripts/adaptive_workflow.sh run --config my_config.json
-
-# Run with LangChain integration
-./scripts/adaptive_workflow.sh run --workflow research --langchain
-
-# View hardware and performance dashboard
-./scripts/adaptive_workflow.sh dashboard
-
-# List available workflows
-./scripts/adaptive_workflow.sh list
-
-# List available workflows in JSON format
-./scripts/adaptive_workflow.sh list --json
-```
 
 ### Workflow Types
 
@@ -121,37 +131,6 @@ flowchart TD
     class J accent
 ```
 
-### Features
-
-- Run inference with DeepHermes models (3B, 8B, 24B) on Apple Silicon
-- Interactive chat mode with history management
-- Memory-efficient options (quantization, lazy loading)
-- Enhanced reasoning capabilities with DeepHermes's specialized thinking process
-- Streaming text generation
-- **LoRA Fine-tuning** for customizing models on your own data
-- **Model Export & Quantization** for optimized deployment
-- **Local Model Serving** via API endpoints
-- **Multi-Model Benchmark Suite** for evaluating model performance
-- **Adaptive Model Selector** for optimal configuration based on hardware
-
-## Quick Start
-
-The fastest way to get started is to use the provided quickstart script:
-
-```bash
-# Make the script executable if needed
-chmod +x quickstart.sh
-
-# Run the quickstart script
-./quickstart.sh
-```
-
-This will:
-- Set up a virtual environment
-- Install dependencies
-- Download the DeepHermes model
-- Provide instructions for running the model
-
 ## Fine-tuning
 
 DeepHermes MLX supports efficient fine-tuning of models on Apple Silicon using Low-Rank Adaptation (LoRA). This allows you to customize models on your own data while maintaining performance.
@@ -170,13 +149,6 @@ DeepHermes MLX supports efficient fine-tuning of models on Apple Silicon using L
   --prompt "Explain the concept of reinforcement learning" \
   --generate
 ```
-
-### Key Features
-
-- **Efficient LoRA Fine-tuning**: Updates only a small fraction of model parameters
-- **HuggingFace Dataset Integration**: Easily use datasets from the HuggingFace Hub
-- **Modular Workflow**: Prepare data, train, evaluate, and generate text in separate steps
-- **Apple Silicon Optimization**: Designed for high performance on M-series chips
 
 ## Model Serving
 
@@ -218,8 +190,6 @@ The server provides the following OpenAI-compatible endpoints:
 ## LangChain Integration
 
 DeepHermes MLX provides seamless integration with LangChain, allowing you to use your DeepHermes models with LangChain's ecosystem of tools and frameworks for building LLM-powered applications.
-
-### Getting Started
 
 There are two ways to use the LangChain integration:
 
@@ -370,25 +340,6 @@ llm = DeepHermesLLM(
 )
 ```
 
-## Installation
-
-1. Clone this repository:
-```bash
-git clone https://github.com/jbarnes850/mlx-deephermes.git
-cd mlx-deephermes
-```
-
-2. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
 ## Usage
 
 ### Interactive Chat
@@ -492,14 +443,6 @@ flowchart TD
     
     class G,H,I primary
 ```
-
-### Features
-
-- Hardware detection optimized for Apple Silicon
-- Intelligent model recommendations based on available memory and processing power
-- Automatic quantization selection
-- Seamless model switching during chat sessions
-- Prioritization options for speed, quality, or memory efficiency
 
 ### Usage
 
