@@ -1,0 +1,71 @@
+{
+  "hardware_profile": {
+    "chip_family": "M4",
+    "chip_variant": "Max",
+    "cpu_cores": 16,
+    "performance_cores": 12,
+    "efficiency_cores": 4,
+    "gpu_cores": 40,
+    "neural_engine_cores": 16,
+    "memory_gb": 48,
+    "memory_bandwidth_gbps": 400,
+    "supports_ray_tracing": true,
+    "total_compute_power": 62.8
+  },
+  "model_config": {
+    "model_id": "mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16",
+    "quantization": null,
+    "lazy_load": false,
+    "max_tokens": 1024,
+    "memory_required_gb": 16.0,
+    "recommendation_reason": "The 8B model is recommended for balanced performance and reasoning quality. Full precision (no quantization) provides the highest quality output. ",
+    "recommendation_confidence": 0.8
+  },
+  "fine_tuning_config": {
+    "lora_rank": 16,
+    "batch_size": 2,
+    "learning_rate": 1e-05,
+    "max_seq_len": 1024,
+    "epochs": 3,
+    "warmup_steps": 100,
+    "save_steps": 200,
+    "eval_steps": 100,
+    "gradient_accumulation_steps": 2,
+    "use_8bit_optimizer": false
+  },
+  "serving_config": {
+    "host": "127.0.0.1",
+    "port": 8080,
+    "max_concurrent_requests": 7,
+    "streaming": true,
+    "max_tokens_per_request": 8192,
+    "context_window": 16384,
+    "temperature": 0.5,
+    "top_p": 0.85,
+    "top_k": 40,
+    "system_prompt": "You are DeepHermes, an advanced AI research assistant. You excel at in-depth analysis, critical thinking, and comprehensive research. You can analyze complex topics from multiple perspectives, evaluate evidence, identify patterns, and synthesize information into clear, well-structured responses. You cite sources when appropriate and acknowledge limitations in your knowledge. Your goal is to provide nuanced, accurate, and thorough responses to research queries.",
+    "reasoning_enabled": true,
+    "reasoning_depth": "expert"
+  },
+  "integration_config": {
+    "cache_limit_gb": 3,
+    "streaming": true,
+    "timeout_seconds": 60,
+    "retry_attempts": 3,
+    "chunk_size": 512,
+    "use_memory_efficient_attention": false
+  },
+  "workflow_type": "research",
+  "performance_targets": {
+    "prioritize_speed": false,
+    "prioritize_quality": true,
+    "max_memory_usage_pct": 80.0
+  },
+  "workflow_template": {
+    "name": "research",
+    "description": "Focused on high-quality, in-depth responses",
+    "system_prompt": "You are DeepHermes, an advanced AI research assistant. You excel at in-depth analysis, critical thinking, and comprehensive research. You can analyze complex topics from multiple perspectives, evaluate evidence, identify patterns, and synthesize information into clear, well-structured responses. You cite sources when appropriate and acknowledge limitations in your knowledge. Your goal is to provide nuanced, accurate, and thorough responses to research queries.",
+    "reasoning_enabled": true,
+    "reasoning_depth": "expert"
+  }
+}

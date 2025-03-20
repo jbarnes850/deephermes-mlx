@@ -9,6 +9,7 @@ from typing import Dict, Any, Optional, List
 import json
 import os
 from .hardware_profiles import AppleSiliconProfile, detect_hardware
+from .workflow_templates import get_workflow_template, apply_workflow_template, WorkflowTemplate
 from ..model_selector.model_recommender import ModelConfig, ModelRecommendation, recommend_model
 from ..model_selector.hardware_detection import get_hardware_info, HardwareInfo
 
@@ -42,11 +43,17 @@ class AdaptiveWorkflowConfig:
         self.prioritize_quality = prioritize_quality
         self.max_memory_usage_pct = max_memory_usage_pct
         
+        # Get the workflow template
+        self.workflow_template = get_workflow_template(workflow_type)
+        
         # Generate configurations for all components
         self.model_config = self._generate_model_config()
         self.fine_tuning_config = self._generate_fine_tuning_config()
         self.serving_config = self._generate_serving_config()
         self.integration_config = self._generate_integration_config()
+        
+        # Apply workflow template adjustments
+        self._apply_workflow_template()
         
     def _generate_model_config(self) -> Dict[str, Any]:
         """Generate model configuration based on hardware profile."""
@@ -148,6 +155,9 @@ class AdaptiveWorkflowConfig:
             "temperature": 0.7,
             "top_p": 0.9,
             "top_k": 40,
+            "system_prompt": self.workflow_template.system_prompt,
+            "reasoning_enabled": self.workflow_template.reasoning_enabled,
+            "reasoning_depth": self.workflow_template.reasoning_depth,
         }
     
     def _generate_integration_config(self) -> Dict[str, Any]:
@@ -169,6 +179,24 @@ class AdaptiveWorkflowConfig:
             "chunk_size": 512,
             "use_memory_efficient_attention": self.hardware_profile.memory_gb < 32,
         }
+    
+    def _apply_workflow_template(self) -> None:
+        """Apply the workflow template to the configuration."""
+        # Apply model config adjustments
+        for key, value in self.workflow_template.model_config_adjustments.items():
+            self.model_config[key] = value
+        
+        # Apply fine-tuning config adjustments
+        for key, value in self.workflow_template.fine_tuning_config_adjustments.items():
+            self.fine_tuning_config[key] = value
+        
+        # Apply serving config adjustments
+        for key, value in self.workflow_template.serving_config_adjustments.items():
+            self.serving_config[key] = value
+        
+        # Apply integration config adjustments
+        for key, value in self.workflow_template.integration_config_adjustments.items():
+            self.integration_config[key] = value
         
     def get_full_config(self) -> Dict[str, Any]:
         """Get the full configuration for all components."""
@@ -195,6 +223,13 @@ class AdaptiveWorkflowConfig:
                 "prioritize_speed": self.prioritize_speed,
                 "prioritize_quality": self.prioritize_quality,
                 "max_memory_usage_pct": self.max_memory_usage_pct,
+            },
+            "workflow_template": {
+                "name": self.workflow_template.name,
+                "description": self.workflow_template.description,
+                "system_prompt": self.workflow_template.system_prompt,
+                "reasoning_enabled": self.workflow_template.reasoning_enabled,
+                "reasoning_depth": self.workflow_template.reasoning_depth,
             }
         }
     

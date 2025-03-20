@@ -21,39 +21,66 @@ We believe that the **Adaptive ML Workflow** is a dynamic approach that intellig
 ### Getting Started
 
 ```bash
-# Run with default settings (balanced performance on general workflow)
-./scripts/adaptive_workflow.sh
+# Configure a general workflow (without running it)
+./scripts/adaptive_workflow.sh configure --workflow general
 
-# Prioritize speed for content creation workflow
-./scripts/adaptive_workflow.sh --workflow content_creation --prioritize speed
+# Run a content creation workflow
+./scripts/adaptive_workflow.sh run --workflow content_creation
+
+# Prioritize speed for coding workflow
+./scripts/adaptive_workflow.sh run --workflow coding --prioritize speed
 
 # Prioritize quality for research workflow
-./scripts/adaptive_workflow.sh --workflow research --prioritize quality
+./scripts/adaptive_workflow.sh run --workflow research --prioritize quality
 
 # Limit memory usage to 60% of available memory
-./scripts/adaptive_workflow.sh --max-memory 60
+./scripts/adaptive_workflow.sh run --max-memory 60
 
 # Save configuration for later use
-./scripts/adaptive_workflow.sh --save-config my_config.json
+./scripts/adaptive_workflow.sh configure --workflow general --save-config my_config.json
 
-# Load a saved configuration
-./scripts/adaptive_workflow.sh --load-config my_config.json
+# Run with a saved configuration
+./scripts/adaptive_workflow.sh run --config my_config.json
+
+# Run with LangChain integration
+./scripts/adaptive_workflow.sh run --workflow research --langchain
 
 # View hardware and performance dashboard
-./scripts/adaptive_workflow.sh --dashboard
+./scripts/adaptive_workflow.sh dashboard
 
-# Output configuration in JSON format
-./scripts/adaptive_workflow.sh --json
+# List available workflows
+./scripts/adaptive_workflow.sh list
+
+# List available workflows in JSON format
+./scripts/adaptive_workflow.sh list --json
 ```
 
 ### Workflow Types
 
-The Adaptive ML Workflow supports different workflow types, each with optimized configurations:
+The Adaptive ML Workflow supports different workflow templates, each optimized for specific use cases:
 
-- **General**: Balanced configuration for general-purpose use
-- **Content Creation**: Optimized for generating creative content
-- **Coding**: Specialized for code generation and completion
-- **Research**: Focused on high-quality, in-depth responses
+- **General**: Balanced configuration for general-purpose use with moderate reasoning capabilities
+- **Content Creation**: Optimized for generating creative content with enhanced system prompts for creative tasks
+- **Coding**: Specialized for code generation and completion with deep reasoning capabilities
+- **Research**: Focused on high-quality, in-depth responses with the deepest reasoning capabilities
+
+Each workflow template includes:
+- Specialized system prompts
+- Tailored reasoning capabilities
+- Optimized model configurations
+- Fine-tuning parameter adjustments
+- Serving configuration optimizations
+- Integration settings for different use cases
+
+### Workflow Runner
+
+The Adaptive ML Workflow includes a workflow runner that executes workflows based on your hardware capabilities and requirements:
+
+- **Hardware-Aware**: Automatically detects and profiles your Apple Silicon hardware
+- **Dynamic Configuration**: Adjusts model parameters based on available resources
+- **Multiple Modes**: Supports both interactive chat and LangChain integration
+- **Configurable**: Can be customized through command-line arguments or configuration files
+- **Reproducible**: Save and load configurations for consistent results
 
 ### Integration with Other Components
 
