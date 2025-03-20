@@ -1,6 +1,15 @@
 #!/bin/bash
 # Quickstart script for DeepHermes MLX
 
+# Display welcome banner
+echo "============================================================"
+echo "                                                            "
+echo "                 🧠 DeepHermes MLX 🧠                      "
+echo "          Adaptive ML for Apple Silicon Devices            "
+echo "                                                            "
+echo "============================================================"
+echo ""
+
 # Parse command line arguments
 TEST_MODE=false
 TEST_OPTION=""
@@ -13,14 +22,21 @@ FORCE_MODEL_SIZE=""
 while [[ $# -gt 0 ]]; do
   case $1 in
     --test)
-      TEST_MODE=true
-      TEST_OPTION="$2"
-      if [[ "$TEST_OPTION" == "2" && $# -gt 2 ]]; then
-        TEST_DATASET="$3"
-        TEST_NUM_EXAMPLES="$4"
-        TEST_PROMPT="$5"
-        shift 5
+      # Only use test mode for automated testing, not for normal user runs
+      if [[ "$2" == "ci" || "$2" == "automated" ]]; then
+        TEST_MODE=true
+        TEST_OPTION="$2"
+        if [[ "$TEST_OPTION" == "2" && $# -gt 2 ]]; then
+          TEST_DATASET="$3"
+          TEST_NUM_EXAMPLES="$4"
+          TEST_PROMPT="$5"
+          shift 5
+        else
+          shift 2
+        fi
       else
+        # For manual testing, just shift the arguments but don't enable test mode
+        echo "Note: --test flag is only for CI/automated testing. Running in normal mode."
         shift 2
       fi
       ;;
@@ -99,11 +115,11 @@ echo ""
 
 # Present options to the user
 echo "What would you like to do?"
-echo "1. Launch chat interface with reasoning"
-echo "2. Fine-tune a reasoning model"
-echo "3. Use LangChain integration"
-echo "4. Run adaptive workflow"
-echo "5. Use Retrieval-Augmented Generation (RAG)"
+echo "1. 🤖 Launch chat interface with reasoning"
+echo "2. 🧠 Fine-tune a reasoning model"
+echo "3. 🔗 Use LangChain integration"
+echo "4. ⚙️  Run adaptive workflow"
+echo "5. 📚 Use Retrieval-Augmented Generation (RAG)"
 echo ""
 if [ "$TEST_MODE" = false ]; then
   read -p "Enter your choice (1-5): " choice
@@ -376,10 +392,10 @@ case $choice in
         
         # Ask for RAG operation
         echo "Select a RAG operation:"
-        echo "1. Add documents to knowledge base"
-        echo "2. Query knowledge base"
-        echo "3. List collections"
-        echo "4. Delete collection"
+        echo "1. 📄 Add documents to knowledge base"
+        echo "2. 🔍 Query knowledge base"
+        echo "3. 📋 List collections"
+        echo "4. 🗑️  Delete collection"
         if [ "$TEST_MODE" = false ]; then
           read -p "Enter your choice (1-4): " rag_choice
         else
