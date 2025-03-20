@@ -150,6 +150,53 @@ DeepHermes MLX supports efficient fine-tuning of models on Apple Silicon using L
   --generate
 ```
 
+## Retrieval-Augmented Generation (RAG)
+
+DeepHermes MLX provides a privacy-focused RAG system that runs entirely on your local machine, leveraging the e5-mistral-7b-instruct-mlx model for embeddings and LanceDB for vector storage.
+
+### RAG Workflow
+
+```bash
+# Add documents to your knowledge base
+./scripts/rag.sh add --path /path/to/documents --collection my_collection
+
+# Query your knowledge base
+./scripts/rag.sh query --query "What is the key concept in this document?" --collection my_collection
+
+# List available collections
+./scripts/rag.sh list
+```
+
+### Key Features
+
+- **100% Local Processing**: All document processing and embedding generation happens on your device
+- **MLX Optimization**: Leverages MLX for high-performance embedding generation on Apple Silicon
+- **Multiple Document Formats**: Support for PDF, TXT, DOCX, and Markdown files
+- **Adaptive Chunking**: Intelligent document chunking based on content type
+- **Seamless Integration**: Works with the Adaptive ML Workflow and fine-tuned models
+
+### Programmatic Usage
+
+```python
+from deephermes.rag import RAGWorkflow
+from deephermes.rag.workflow_integration import RAGWorkflowRunner
+
+# Create a RAG workflow
+rag = RAGWorkflow(collection_name="my_collection")
+
+# Add documents
+rag.add_documents(["/path/to/document.pdf"])
+
+# Query the knowledge base
+results = rag.query("What are the main points in this document?")
+print(results)
+
+# Use with the workflow runner for enhanced responses
+runner = RAGWorkflowRunner(model_path="mlx-community/DeepHermes-3-Llama-3-8B-Preview-bf16")
+response = runner.run("Summarize the key concepts in these documents", collection_name="my_collection")
+print(response)
+```
+
 ## Model Serving
 
 DeepHermes MLX includes a serve module that allows you to deploy your models with an OpenAI-compatible API server. This enables seamless integration with existing tools and applications that support the OpenAI API.
