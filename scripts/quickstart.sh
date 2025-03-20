@@ -103,9 +103,10 @@ echo "1. Launch chat interface with reasoning"
 echo "2. Fine-tune a reasoning model"
 echo "3. Use LangChain integration"
 echo "4. Run adaptive workflow"
+echo "5. Use Retrieval-Augmented Generation (RAG)"
 echo ""
 if [ "$TEST_MODE" = false ]; then
-  read -p "Enter your choice (1-4): " choice
+  read -p "Enter your choice (1-5): " choice
 else
   choice=$TEST_OPTION
   echo "Selected option: $choice"
@@ -367,6 +368,143 @@ case $choice in
         echo ""
         echo "Running $workflow workflow..."
         ./scripts/adaptive_workflow.sh run --workflow "$workflow" $priority_option $langchain_option
+        ;;
+    5)
+        echo ""
+        echo "Starting Retrieval-Augmented Generation (RAG)..."
+        echo ""
+        
+        # Ask for RAG operation
+        echo "Select a RAG operation:"
+        echo "1. Add documents to knowledge base"
+        echo "2. Query knowledge base"
+        echo "3. List collections"
+        echo "4. Delete collection"
+        if [ "$TEST_MODE" = false ]; then
+          read -p "Enter your choice (1-4): " rag_choice
+        else
+          rag_choice="1"
+          echo "Selected operation: Add documents"
+        fi
+        
+        case $rag_choice in
+            1)
+                # Add documents
+                echo ""
+                echo "Adding documents to knowledge base..."
+                
+                # Ask for path
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Enter path to document or directory: " doc_path
+                else
+                  doc_path="./examples/documents"
+                  echo "Using path: $doc_path"
+                fi
+                
+                # Ask for collection name
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Enter collection name (default: default): " collection_name
+                  collection_name=${collection_name:-default}
+                else
+                  collection_name="default"
+                  echo "Using collection: $collection_name"
+                fi
+                
+                # Ask for recursive option
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Process subdirectories recursively? (y/n): " recursive
+                else
+                  recursive="n"
+                  echo "Not processing recursively"
+                fi
+                
+                # Build command options
+                rag_opts="--collection \"$collection_name\""
+                if [ "$recursive" = "y" ] || [ "$recursive" = "Y" ]; then
+                  rag_opts="$rag_opts --recursive"
+                fi
+                
+                # Run command
+                echo ""
+                echo "Adding documents from $doc_path to collection $collection_name..."
+                ./scripts/rag.sh add $rag_opts "$doc_path"
+                ;;
+                
+            2)
+                # Query knowledge base
+                echo ""
+                echo "Querying knowledge base..."
+                
+                # Ask for collection name
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Enter collection name (default: default): " collection_name
+                  collection_name=${collection_name:-default}
+                else
+                  collection_name="default"
+                  echo "Using collection: $collection_name"
+                fi
+                
+                # Ask for query or interactive mode
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Enter query (leave empty for interactive mode): " query
+                else
+                  query="What are the main topics in these documents?"
+                  echo "Using query: $query"
+                fi
+                
+                # Run command
+                echo ""
+                if [ -z "$query" ]; then
+                  echo "Starting interactive query mode for collection $collection_name..."
+                  ./scripts/rag.sh query --collection "$collection_name"
+                else
+                  echo "Querying collection $collection_name..."
+                  ./scripts/rag.sh query --collection "$collection_name" "$query"
+                fi
+                ;;
+                
+            3)
+                # List collections
+                echo ""
+                echo "Listing RAG collections..."
+                ./scripts/rag.sh list
+                ;;
+                
+            4)
+                # Delete collection
+                echo ""
+                echo "Deleting RAG collection..."
+                
+                # Ask for collection name
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Enter collection name to delete: " collection_name
+                else
+                  collection_name="test_collection"
+                  echo "Deleting collection: $collection_name"
+                fi
+                
+                # Confirm deletion
+                if [ "$TEST_MODE" = false ]; then
+                  read -p "Are you sure you want to delete collection '$collection_name'? (y/n): " confirm
+                else
+                  confirm="y"
+                  echo "Confirming deletion"
+                fi
+                
+                # Run command
+                if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
+                  echo ""
+                  echo "Deleting collection $collection_name..."
+                  ./scripts/rag.sh delete "$collection_name" --force
+                else
+                  echo "Deletion cancelled."
+                fi
+                ;;
+                
+            *)
+                echo "Invalid choice. Exiting RAG operations."
+                ;;
+        esac
         ;;
     *)
         echo "Invalid choice. Exiting."
