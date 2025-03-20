@@ -52,7 +52,9 @@ This will:
   - 🧠 **Fine-tune a reasoning model** - Customize the model with your local data
   - 🔗 **Use LangChain integration** - Connect with the LangChain ecosystem
   - ⚙️ **Run adaptive workflows** - Run local workflows with adaptive configurations (code generation, research, and content creation)
-  - 📚 **Use Retrieval-Augmented Generation (RAG)** - Import your local files for retrieval and generate responses with context.
+  - 📚 **Use Retrieval-Augmented Generation (RAG)** - Import your local files for retrieval and generate responses with context
+  - 📦 **Export model for deployment** - Optimize models with quantization for efficient deployment
+  - 🌐 **Serve model with OpenAI-compatible API** - Deploy your models locally with an API that works with existing tools
 
 The adaptive workflows feature is core to DeepHermes MLX, intelligently adapting to your specific hardware capabilities to maximize performance while maintaining privacy. Choose from specialized workflows (General, Content Creation, Coding, Research) that configure every aspect of the ML pipeline based on your device's capabilities and your performance priorities.
 

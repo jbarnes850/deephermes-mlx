@@ -120,9 +120,11 @@ echo "2. 🧠 Fine-tune a reasoning model"
 echo "3. 🔗 Use LangChain integration"
 echo "4. ⚙️  Run adaptive workflow"
 echo "5. 📚 Use Retrieval-Augmented Generation (RAG)"
+echo "6. 📦 Export model for deployment"
+echo "7. 🌐 Serve model with OpenAI-compatible API"
 echo ""
 if [ "$TEST_MODE" = false ]; then
-  read -p "Enter your choice (1-5): " choice
+  read -p "Enter your choice (1-7): " choice
 else
   choice=$TEST_OPTION
   echo "Selected option: $choice"
@@ -521,6 +523,129 @@ case $choice in
                 echo "Invalid choice. Exiting RAG operations."
                 ;;
         esac
+        ;;
+    6)
+        echo ""
+        echo "${BLUE}=======================================================${NC}"
+        echo "${GREEN}           Export Model for Deployment              ${NC}"
+        echo "${BLUE}=======================================================${NC}"
+        echo "${YELLOW}Starting model export workflow...${NC}"
+        echo ""
+        
+        # Ask for model path
+        if [ "$TEST_MODE" = false ]; then
+          read -p "Enter the path to your model or adapter (default: $MODEL_ID): " model_path
+          model_path=${model_path:-$MODEL_ID}
+          
+          # Ask for output directory
+          read -p "Enter output directory (default: ./exported_model): " output_dir
+          output_dir=${output_dir:-"./exported_model"}
+          
+          # Ask for quantization
+          echo "Select quantization level:"
+          echo "1. 🚀 None (highest quality, largest size)"
+          echo "2. 🔋 INT8 (balanced performance and quality)"
+          echo "3. 📱 INT4 (fastest, smallest size)"
+          read -p "Enter your choice (1-3): " quant_choice
+          
+          case $quant_choice in
+              1) quantize="none" ;;
+              2) quantize="int8" ;;
+              3) quantize="int4" ;;
+              *) quantize="none" ;;
+          esac
+          
+          # Ask for validation
+          read -p "Validate exported model? (y/n, default: n): " validate
+          if [[ "$validate" == "y" || "$validate" == "Y" ]]; then
+            validate_flag="--validate"
+          else
+            validate_flag=""
+          fi
+          
+          # Run export
+          echo ""
+          echo "${YELLOW}Exporting model with the following configuration:${NC}"
+          echo "- Model: $model_path"
+          echo "- Output directory: $output_dir"
+          echo "- Quantization: $quantize"
+          echo "- Validation: ${validate_flag:-none}"
+          echo ""
+          
+          ./scripts/export_model.sh --model "$model_path" --output "$output_dir" --quantize "$quantize" $validate_flag
+        else
+          # Test mode - use defaults
+          echo "Using default model: $MODEL_ID"
+          ./scripts/export_model.sh --model "$MODEL_ID"
+        fi
+        ;;
+    7)
+        echo ""
+        echo "${BLUE}=======================================================${NC}"
+        echo "${GREEN}      Serve Model with OpenAI-compatible API        ${NC}"
+        echo "${BLUE}=======================================================${NC}"
+        echo "${YELLOW}Starting model serving workflow...${NC}"
+        echo ""
+        
+        if [ "$TEST_MODE" = false ]; then
+          # Ask for model path
+          read -p "Enter the path to your exported model (default: $MODEL_ID): " model_path
+          model_path=${model_path:-$MODEL_ID}
+          
+          # Ask for host
+          read -p "Enter host to bind server (default: 127.0.0.1): " host
+          host=${host:-"127.0.0.1"}
+          
+          # Ask for port
+          read -p "Enter port to bind server (default: 8080): " port
+          port=${port:-"8080"}
+          
+          # Ask for command
+          echo "Select operation:"
+          echo "1. 🚀 Start server"
+          echo "2. 🔍 Check server status"
+          echo "3. 🧪 Test server with a prompt"
+          echo "4. 🛑 Stop server"
+          read -p "Enter your choice (1-4): " serve_choice
+          
+          case $serve_choice in
+              1) command="start" ;;
+              2) command="status" ;;
+              3) command="test" ;;
+              4) command="stop" ;;
+              *) command="start" ;;
+          esac
+          
+          # If test, ask for prompt
+          if [ "$command" == "test" ]; then
+            read -p "Enter test prompt: " test_prompt
+            prompt_flag="--prompt \"$test_prompt\""
+          else
+            prompt_flag=""
+          fi
+          
+          # Run server command
+          echo ""
+          echo "${YELLOW}Running server command with the following configuration:${NC}"
+          echo "- Command: $command"
+          echo "- Model: $model_path"
+          echo "- Host: $host"
+          echo "- Port: $port"
+          if [ -n "$prompt_flag" ]; then
+            echo "- Prompt: $test_prompt"
+          fi
+          echo ""
+          
+          if [ "$command" == "test" ]; then
+            ./scripts/serve_model.sh $command --model "$model_path" --host "$host" --port "$port" --prompt "$test_prompt"
+          else
+            ./scripts/serve_model.sh $command --model "$model_path" --host "$host" --port "$port"
+          fi
+        else
+          # Test mode - use defaults
+          echo "Using default model: $MODEL_ID"
+          ./scripts/serve_model.sh start --model "$MODEL_ID"
+        fi
         ;;
     *)
         echo "Invalid choice. Exiting."
