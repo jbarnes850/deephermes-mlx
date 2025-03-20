@@ -58,7 +58,7 @@ This will:
 
 The adaptive workflows feature is core to DeepHermes MLX, intelligently adapting to your specific hardware capabilities to maximize performance while maintaining privacy. Choose from specialized workflows (General, Content Creation, Coding, Research) that configure every aspect of the ML pipeline based on your device's capabilities and your performance priorities.
 
-### Key Features
+### Key Adaptive Features
 
 - **Hardware Detection**: Automatically detects and profiles your Apple Silicon hardware
 - **Intelligent Configuration**: Optimizes model selection, fine-tuning, serving, and integration parameters
