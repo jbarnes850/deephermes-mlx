@@ -102,9 +102,10 @@ echo "What would you like to do?"
 echo "1. Launch chat interface with reasoning"
 echo "2. Fine-tune a reasoning model"
 echo "3. Use LangChain integration"
+echo "4. Run adaptive workflow"
 echo ""
 if [ "$TEST_MODE" = false ]; then
-  read -p "Enter your choice (1-3): " choice
+  read -p "Enter your choice (1-4): " choice
 else
   choice=$TEST_OPTION
   echo "Selected option: $choice"
@@ -284,6 +285,88 @@ case $choice in
                 ./scripts/integrate.sh $server_args chat
                 ;;
         esac
+        ;;
+    4)
+        echo ""
+        echo "Starting adaptive workflow..."
+        echo ""
+        
+        # Ask for workflow template
+        echo "Select a workflow template:"
+        echo "1. General (balanced configuration for general-purpose use)"
+        echo "2. Content Creation (optimized for generating creative content)"
+        echo "3. Coding (specialized for code generation and completion)"
+        echo "4. Research (focused on high-quality, in-depth responses)"
+        if [ "$TEST_MODE" = false ]; then
+          read -p "Enter your choice (1-4): " workflow_choice
+        else
+          workflow_choice="1"
+          echo "Selected workflow: General"
+        fi
+        
+        # Ask for performance priority
+        echo ""
+        echo "Select performance priority:"
+        echo "1. Balanced (default)"
+        echo "2. Speed (faster responses, potentially lower quality)"
+        echo "3. Quality (higher quality responses, potentially slower)"
+        if [ "$TEST_MODE" = false ]; then
+          read -p "Enter your choice (1-3): " priority_choice
+        else
+          priority_choice="1"
+          echo "Selected priority: Balanced"
+        fi
+        
+        # Set workflow and priority options
+        case $workflow_choice in
+            1)
+                workflow="general"
+                ;;
+            2)
+                workflow="content_creation"
+                ;;
+            3)
+                workflow="coding"
+                ;;
+            4)
+                workflow="research"
+                ;;
+            *)
+                echo "Invalid choice. Using general workflow."
+                workflow="general"
+                ;;
+        esac
+        
+        case $priority_choice in
+            2)
+                priority_option="--prioritize-speed"
+                ;;
+            3)
+                priority_option="--prioritize-quality"
+                ;;
+            *)
+                priority_option=""
+                ;;
+        esac
+        
+        # Ask if user wants to use LangChain integration
+        echo ""
+        if [ "$TEST_MODE" = false ]; then
+          read -p "Use LangChain integration? (y/n): " use_langchain
+        else
+          use_langchain="n"
+          echo "Not using LangChain integration"
+        fi
+        
+        if [ "$use_langchain" = "y" ] || [ "$use_langchain" = "Y" ]; then
+            langchain_option="--langchain"
+        else
+            langchain_option=""
+        fi
+        
+        echo ""
+        echo "Running $workflow workflow..."
+        ./scripts/adaptive_workflow.sh run --workflow "$workflow" $priority_option $langchain_option
         ;;
     *)
         echo "Invalid choice. Exiting."
