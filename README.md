@@ -37,10 +37,10 @@ The fastest way to get started is to use the provided quickstart script:
 
 ```bash
 # Make the script executable if needed
-chmod +x quickstart.sh
+chmod +x scripts/quickstart.sh
 
 # Run the quickstart script
-./quickstart.sh
+./scripts/quickstart.sh
 ```
 
 This will:
@@ -48,10 +48,11 @@ This will:
 - Install dependencies
 - Download the DeepHermes model optimized for your hardware
 - Provide options to:
-  - Launch an interactive chat interface
-  - Fine-tune a model with your data
-  - Use LangChain integration
-  - **Run adaptive workflows** that automatically configure for your hardware
+  - 🤖 **Launch chat interface with reasoning** - Interactive chat with a DeepHermes Reasoning model
+  - 🧠 **Fine-tune a reasoning model** - Customize the model with your local data
+  - 🔗 **Use LangChain integration** - Connect with the LangChain ecosystem
+  - ⚙️ **Run adaptive workflows** - Run local workflows with adaptive configurations (code generation, research, and content creation)
+  - 📚 **Use Retrieval-Augmented Generation (RAG)** - Import your local files for retrieval and generate responses with context.
 
 The adaptive workflows feature is core to DeepHermes MLX, intelligently adapting to your specific hardware capabilities to maximize performance while maintaining privacy. Choose from specialized workflows (General, Content Creation, Coding, Research) that configure every aspect of the ML pipeline based on your device's capabilities and your performance priorities.
 
@@ -249,7 +250,7 @@ There are two ways to use the LangChain integration:
 2. **Connect to an existing server**:
    ```bash
    # First start the MLX-LM server
-   venv/bin/mlx_lm.server --model mlx-community/Phi-3-mini-4k-instruct-4bit --host 127.0.0.1 --port 8080
+   venv/bin/mlx_lm.server --model mlx-community/Phi-3-mini-4k-instruct-mlx --host 127.0.0.1 --port 8080
    
    # In a separate terminal, run the LangChain example
    venv/bin/python examples/langchain_example.py --host 127.0.0.1 --port 8080 --example llm
